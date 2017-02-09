@@ -26,13 +26,26 @@ wss.broadcast = (data) => {
   });
 };
 
+const getImageUrls = function(string) {
+  string.includes(/^http*.gif$/)
+}
+
+const colors = ['#ff0000', '#00ff00', '#0000ff', 'tomato'];
 
 // Set up a callback that will run when a client connects to the server
 // When a client connects they are assigned a socket, represented by
 // the ws parameter in the callback.
-let clientCount = 0;
 wss.on('connection', (ws) => {
-  console.log(++clientCount, 'client(s) connected');
+  let count = wss.clients.size;
+  console.log(count, 'client(s) connected');
+  
+  const setupMessage = {
+    count: count,
+    color: colors[Math.floor(Math.random() * 4)]
+  }
+  wss.broadcast(JSON.stringify(setupMessage));
+
+
 
   // on message
   ws.on('message', (message) => {
@@ -41,12 +54,25 @@ wss.on('connection', (ws) => {
     // setting the message id to a random uuid
     mssgObj.id = uuid.v4();
 
+    //set message type before broadcasting
+    switch(mssgObj.type) {
+      case "postMessage":
+        mssgObj.type = "incomingMessage";
+        break;
+      case "postNotification":
+        mssgObj.type = "incomingNotification"
+        break;
+      default:
+        console.log("Unknown event type " + mssgObj.type);
+    }
+
     // broadcast to all connected
     wss.broadcast(JSON.stringify(mssgObj));
   });
 
   // Set up a callback for when a client closes the socket. This usually means they closed their browser.
   ws.on('close', () => {
-    console.log(`A client disconnected, remaining ${--clientCount} client(s)`);
-  });
+    console.log(`Client disconnected, remaining ${wss.clients.size} client(s)`);
+    wss.broadcast(`${wss.clients.size}`);
+  })
 });

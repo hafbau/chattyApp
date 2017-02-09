@@ -21,10 +21,14 @@ class App extends Component {
     this.socket = chatSocket;
 
     this.socket.onmessage = (event) => {
-      console.log(event);
       const newMessage = JSON.parse(event.data);
-      const messages = this.state.messages.concat(newMessage);
-      this.setState({messages});
+      if (!newMessage.type) {
+        this.setState({usersCount: newMessage.count});
+        if (!this.state.color) this.setState({color: newMessage.color});
+      } else {
+        const messages = this.state.messages.concat(newMessage);
+        this.setState({messages});
+      }
     }
   }
 
@@ -34,7 +38,8 @@ class App extends Component {
         username: this.state.currentUser.name,
         content: e.target.value
       };
-      
+      newMessage.type = 'postMessage';
+      newMessage.color = this.state.color;
       this.socket.send(JSON.stringify(newMessage));
       e.target.value = "";
     }
@@ -45,14 +50,20 @@ class App extends Component {
       const currentUser = {
         name: e.target.value
       };
+      const sysMessage = {
+        type: 'postNotification',
+        oldname: this.state.currentUser.name,
+        username: currentUser.name
+      };
       this.setState({currentUser});
+      this.socket.send(JSON.stringify(sysMessage));
     }
   }
 
   render() {
     return (<div>
-              <h1>Hello Chatty :)</h1>
-              <MessageList messages={this.state.messages}/>
+              <span className="nav-status">{this.state.usersCount} user(s) online</span>
+              <MessageList messages={this.state.messages} color={this.state.color}/>
               <ChatBar currentUser={this.state.currentUser} getUsername={this.getUsername} onChange={this.getText}/>
             </div>
     );
