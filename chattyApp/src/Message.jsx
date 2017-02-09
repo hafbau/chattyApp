@@ -41,7 +41,6 @@ class Message extends Component {
     switch(this.props.message.type) {
       case "incomingMessage":
         // handle incoming message
-                
         return (
           <div className="message">
             <span className="message-username" style={{color: this.props.message.color}}>{this.props.message.username}</span>
