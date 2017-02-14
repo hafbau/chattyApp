@@ -26,10 +26,6 @@ wss.broadcast = (data) => {
   });
 };
 
-const getImageUrls = function(string) {
-  string.includes(/^http*.gif$/)
-}
-
 const colors = ['#ff0000', '#00ff00', '#0000ff', 'tomato'];
 
 // Set up a callback that will run when a client connects to the server
