@@ -8,9 +8,7 @@ class App extends Component {
     this.state = {
       currentUser: {name: "Bob"}, // optional. if currentUser is not defined, it means the user is Anonymous
       messages: []
-    };
-    this.getText = this.getText.bind(this);
-    this.getUsername = this.getUsername.bind(this);
+    }
   }
 
   componentDidMount() {
@@ -64,7 +62,7 @@ class App extends Component {
     return (<div>
               <span className="nav-status">{this.state.usersCount} user(s) online</span>
               <MessageList messages={this.state.messages} color={this.state.color}/>
-              <ChatBar currentUser={this.state.currentUser} getUsername={this.getUsername} onChange={this.getText}/>
+              <ChatBar currentUser={this.state.currentUser} getUsername={(e) => {this.getUsername(e)}} onChange={(e) => {this.getText(e)}}/>
             </div>
     );
   }
